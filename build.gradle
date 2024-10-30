@@ -1,0 +1,101 @@
+/*
+ * Package Counter
+ * Noah Dinan
+ * November 2024
+ */
+
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'application'
+    id 'java-library'
+    id 'com.diffplug.spotless' version '7.0.0.BETA2'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+ext {
+    projectName = 'Main'
+}
+
+
+eclipse {
+    project {
+        name = "$projectName"
+    }
+
+    classpath {
+        defaultOutputDir = file("${project.projectDir}/build/eclipse")
+        file {
+            whenMerged {
+                cp -> cp.getEntries().forEach{
+                    cpEntry -> if(cpEntry.kind=='src') {
+                        cpEntry.output = cpEntry.output.replace('bin/', 'build/eclipse/')
+                    }
+                }
+            }
+        }
+    }
+}
+
+application {
+    mainClass = "mail." + "$projectName"
+}
+
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+}
+
+dependencies {
+    implementation 'commons-httpclient:commons-httpclient:3.1'
+    implementation 'org.apache.poi:poi:4.0.0'
+    implementation 'org.apache.poi:poi-ooxml:4.0.0'
+}
+
+group = 'mail'
+version = '1.0.0'
+java.sourceCompatibility = "22.0.2"
+
+javafx {
+    version = "22.0.2"
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.base', 'javafx.swing', 'javafx.graphics' ]
+}
+
+run {
+    standardInput = System.in
+}
+
+/** 
+ * :uberjar - packages JavaFX programs [needs Main.java entrypoint]
+ */
+task uberjar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'mail.Main'
+    }
+    archiveBaseName = "$projectName"
+    archiveClassifier = ""
+    archiveVersion = ""
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+
+        resources {
+            srcDirs = ['src/resources']
+        }
+    }
+}
+
+spotless {
+  java {
+    indentWithSpaces(4)
+    formatAnnotations()
+  }
+}
+
