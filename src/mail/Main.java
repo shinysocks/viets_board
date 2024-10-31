@@ -1,8 +1,7 @@
 package mail;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -25,9 +24,7 @@ public class Main {
 
         try {
             if (HttpStatus.SC_OK == new HttpClient().executeMethod(get)) {
-                File target = new File("data.xlsx");
-                get.getResponseBodyAsStream().transferTo(new FileOutputStream(target));
-                printData(target);
+                printData(get.getResponseBodyAsStream());
             } else {
                 throw new IOException("Unable to load page, error " + get.getStatusLine());
             }
@@ -36,8 +33,8 @@ public class Main {
         }
     }
 
-    private static void printData(File file) throws InvalidFormatException, IOException {
-        final XSSFWorkbook book = new XSSFWorkbook(file);
+    private static void printData(InputStream stream) throws InvalidFormatException, IOException {
+        final XSSFWorkbook book = new XSSFWorkbook(stream); // use InputStream instead of a File
         final XSSFSheet sheet = book.getSheetAt(0);
 
         for (Row row : sheet) {
