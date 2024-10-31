@@ -19,7 +19,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        //Demo.main(args);
 
         final String URL = args[0] + "?download=1";
         final GetMethod get = new GetMethod(URL);
@@ -43,7 +42,7 @@ public class Main {
 
         for (Row row : sheet) {
             for (Cell cell : row) {
-                System.out.println(cell.getNumericCellValue());
+                System.out.println(cell.getStringCellValue());
             }
         }
 
